@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "poker-monte-carlo"
+version = "0.0.1"
+description = ""
+authors = ["Valentin <valentin.foucher@free.fr>"]
+readme = "README.md"
+packages = [{include = "poker_monte_carlo"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
