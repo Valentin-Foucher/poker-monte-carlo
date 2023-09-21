@@ -3,7 +3,6 @@ import dataclasses
 import enum
 
 from poker_monte_carlo.model import Card, Colors
-from poker_monte_carlo.types import Hand, Board
 
 
 class Combinations(enum.Enum):
@@ -171,7 +170,7 @@ def _find_straight_flush(cards: [Card]) -> tuple[list[Card], list[Card]]:
     return straight_flush, cards_left
 
 
-def find_best_combination(hand: Hand, board: Board) -> BestCards:
+def find_best_combination(hand: tuple[Card, ...], board: tuple[Card, ...]) -> BestCards:
     cards = sorted(hand + board, key=lambda c: c.values[0])
     best_combo = []
     best_combination = Combinations.HIGH_CARD

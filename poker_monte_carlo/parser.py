@@ -1,5 +1,4 @@
 from poker_monte_carlo.model import Card, Colors
-from poker_monte_carlo.types import Board, Hand
 
 
 def _color_from_string(c: str) -> Colors:
@@ -44,17 +43,19 @@ def _parse_card_list(card_list_str: str) -> tuple[Card, ...]:
     return tuple(map(lambda x: _parse_card(x), card_list_str.split(' ')))
 
 
-def parse_board(card_list_str: str) -> Board:
-    cl = _parse_card_list(card_list_str)
+def parse_board(board: str) -> tuple[Card, ...]:
+    cl = _parse_card_list(board)
     if (count := len(cl)) > 5 or count < 3:
         raise Exception(f'Invalid count of cards for a board ({count})')
-    # noinspection PyTypeChecker
     return cl
 
 
-def parse_hand(card_list_str: str) -> Hand:
-    cl = _parse_card_list(card_list_str)
+def parse_hand(hand: str) -> tuple[Card, ...]:
+    cl = _parse_card_list(hand)
     if count := len(cl) != 2:
         raise Exception(f'Invalid count of cards for a hand ({count})')
-    # noinspection PyTypeChecker
     return cl
+
+
+def parse_stack(stack: list[str]) -> list[Card]:
+    return list(map(lambda c: _parse_card_list(c)[0], stack))
