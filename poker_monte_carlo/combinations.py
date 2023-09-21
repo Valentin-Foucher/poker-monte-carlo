@@ -1,12 +1,30 @@
 import copy
+import dataclasses
 import enum
 
-from poker_monte_carlo.model import Card, Color
+from poker_monte_carlo.model import Card, Colors
 from poker_monte_carlo.types import Hand, Board
 
 
-class CombinationValue(enum.Enum):
-    pass
+class Combinations(enum.Enum):
+    HIGH_CARD = 'High card'
+    PAIR = 'Pair'
+    TWO_PAIRS = 'Two Pairs'
+    SET = 'Set'
+    STRAIGHT = 'Straight'
+    FLUSH = 'Flush'
+    FULL_HOUSE = 'Full House'
+    QUADS = 'Quads'
+    STRAIGHT_FLUSH = 'Straight Flush'
+
+    def __str__(self):
+        return self.value
+
+
+@dataclasses.dataclass
+class Combination:
+    cards: list[Card]
+    name: Combinations
 
 
 def _find_highest_cards(combo: list[Card], cards_left: list[Card]) -> list[Card]:
@@ -96,7 +114,7 @@ def _find_flush(cards: [Card]) -> tuple[list[Card], list[Card]]:
     cards_copy = copy.copy(cards)
     cards_count = len(cards)
     cpt = cards_count - 1
-    flush_cpt = {Color.CLUB: [], Color.SPADE: [], Color.DIAMOND: [], Color.HEART: []}
+    flush_cpt = {Colors.CLUB: [], Colors.SPADE: [], Colors.DIAMOND: [], Colors.HEART: []}
     flush_value = []
 
     while cpt >= 0:
@@ -153,23 +171,25 @@ def _find_straight_flush(cards: [Card]) -> tuple[list[Card], list[Card]]:
     return straight_flush, cards_left
 
 
-def find_best_combination(hand: Hand, board: Board) -> list[Card]:
+def find_best_combination(hand: Hand, board: Board) -> Combination:
     cards = sorted(hand + board, key=lambda c: c.values[0])
     best_combo = []
+    best_combination = Combinations.HIGH_CARD
 
-    for rule in (_find_straight_flush,
-                 _find_quads,
-                 _find_full_house,
-                 _find_flush,
-                 _find_straight,
-                 _find_set,
-                 _find_two_pairs,
-                 _find_pair):
+    for rule, combination in ((_find_straight_flush, Combinations.STRAIGHT_FLUSH),
+                        (_find_quads, Combinations.QUADS),
+                        (_find_full_house, Combinations.FULL_HOUSE),
+                        (_find_flush, Combinations.STRAIGHT_FLUSH),
+                        (_find_straight, Combinations.STRAIGHT),
+                        (_find_set, Combinations.SET),
+                        (_find_two_pairs, Combinations.TWO_PAIRS),
+                        (_find_pair, Combinations.PAIR)):
 
-        combination, cards_left = rule(cards)
-        if combination:
-            best_combo = combination
+        used_cards, cards_left = rule(cards)
+        if used_cards:
+            best_combo = used_cards
+            best_combination = combination
             cards = cards_left
             break
 
-    return _find_highest_cards(best_combo, cards)
+    return Combination(cards=_find_highest_cards(best_combo, cards), name=best_combination)

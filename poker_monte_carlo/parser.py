@@ -1,17 +1,17 @@
-from poker_monte_carlo.model import Card, Color
+from poker_monte_carlo.model import Card, Colors
 from poker_monte_carlo.types import Board, Hand
 
 
-def _color_from_string(c: str) -> Color:
+def _color_from_string(c: str) -> Colors:
     match c:
         case 'd':
-            return Color.DIAMOND
+            return Colors.DIAMOND
         case 'h':
-            return Color.HEART
+            return Colors.HEART
         case 's':
-            return Color.SPADE
+            return Colors.SPADE
         case 'c':
-            return Color.CLUB
+            return Colors.CLUB
 
     raise Exception(f'Invalid color {c}')
 
@@ -46,7 +46,7 @@ def _parse_card_list(card_list_str: str) -> tuple[Card, ...]:
 
 def parse_board(card_list_str: str) -> Board:
     cl = _parse_card_list(card_list_str)
-    if count := len(cl) != 5:
+    if (count := len(cl)) > 5 or count < 3:
         raise Exception(f'Invalid count of cards for a board ({count})')
     # noinspection PyTypeChecker
     return cl
