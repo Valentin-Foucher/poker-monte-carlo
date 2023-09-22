@@ -36,7 +36,8 @@ def _parse_card(card_str: str) -> Card:
     val, col = card_str[:-1], card_str[-1]
 
     return Card(values=_values_from_string(val),
-                color=_color_from_string(col))
+                color=_color_from_string(col),
+                value_as_string=val)
 
 
 def _parse_card_list(card_list_str: str) -> tuple[Card, ...]:
