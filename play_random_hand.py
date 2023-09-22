@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from poker_monte_carlo import stack
@@ -7,13 +8,21 @@ from poker_monte_carlo.parser import parse_board, parse_hand, parse_stack
 from poker_monte_carlo.simulation import get_percentage_for_hands
 
 
+def clear_screen():
+    from sys import platform
+    match platform:
+        case 'linux' | 'linux2' | 'darwin':
+            os.system('clear')
+        case 'win32':
+            os.system('cls')
+        case other:
+            raise Exception(f'OS not recognized ({other}')
+
+
 def play_street(s: list[str], first_player_hand: tuple[Card, ...], second_player_hand: tuple[Card, ...],
                 b: Optional[str] = None):
-    if b:
-        parsed_board = parse_board(b)
-        print(f'Board: {parsed_board}')
-    else:
-        parsed_board = []
+
+    parsed_board = parse_board(b) if b else []
 
     first_player_chances, second_player_chances = get_percentage_for_hands(
         first_player_hand,
@@ -22,12 +31,10 @@ def play_street(s: list[str], first_player_hand: tuple[Card, ...], second_player
         parsed_board
     )
 
-    print(f'first player hand: {find_best_combination(first_player_hand, parsed_board).combination} - '
-          f'{find_best_combination(first_player_hand, parsed_board).cards} - '
-          f'{first_player_chances}%')
-    print(f'Second player hand: {find_best_combination(second_player_hand, parsed_board).combination} - '
-          f'{find_best_combination(second_player_hand, parsed_board).cards} - '
-          f'{second_player_chances}%\n')
+    clear_screen()
+    print(f'first player hand: {first_player_hand} - {first_player_chances}%\n\n'
+          f'{f"Board: {parsed_board}" if parsed_board else ""}\n\n'
+          f'Second player hand: {second_player_hand} - {second_player_chances}%\n')
 
     return parsed_board
 
@@ -38,16 +45,7 @@ def main():
 
         first_player_hand = parse_hand(stack.draw_hand(s))
         second_player_hand = parse_hand(stack.draw_hand(s))
-
-        preflop_first_player_chances, preflop_second_player_chances = get_percentage_for_hands(
-            first_player_hand,
-            second_player_hand,
-            parse_stack(s),
-            tuple()
-        )
-
-        print(f'first player hand: {first_player_hand} - {preflop_first_player_chances}%')
-        print(f'Second player hand: {second_player_hand} - {preflop_second_player_chances}%\n')
+        play_street(s, first_player_hand, second_player_hand)
 
         board = stack.draw_flop(s)
         play_street(s, first_player_hand, second_player_hand, board)
@@ -62,18 +60,17 @@ def main():
                                       find_best_combination(second_player_hand, final_board))
 
         if result == 1:
-            print('Player 1 wins')
+            print('Player 1 wins!')
         elif result == -1:
-            print('Player 2 wins')
+            print('Player 2 wins!')
         else:
-            print('Draw')
+            print('Draw!')
 
-        user_response = input('Do you want to play another hand? (y/n)')
+        user_response = input('\nDo you want to play another hand? (y/n)')
         if user_response not in ('y', 'Y'):
             break
-
-        print('\033c', end='')
 
 
 if __name__ == '__main__':
     main()
+
