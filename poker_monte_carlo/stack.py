@@ -8,7 +8,7 @@ def generate_stack(n: int = 52) -> list[str]:
         raise Exception(f'Cannot generate a stack larger than 52 cards (got {n})')
 
     s = []
-    for val in ('A', 'K', 'Q', 'J', *range(2, 12)):
+    for val in ('A', 'K', 'Q', 'J', *range(2, 11)):
         for col in Colors.values_as_text():
             s.append(f'{val}{col}')
 
