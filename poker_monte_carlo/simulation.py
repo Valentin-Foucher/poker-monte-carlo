@@ -5,10 +5,12 @@ from poker_monte_carlo.combinations import compare_combinations, find_best_combi
 from poker_monte_carlo.model import Card
 
 
-def get_percentage_for_hands(first_player_hand: tuple[Card, ...], second_player_hand: tuple[Card, ...],
-                             stack: list[Card], board: tuple[Card, ...], n: int = 100000):
-    player_1_wins = 0
-    player_2_wins = 0
+def get_percentage_for_hands(hands: list[tuple[Card, ...]],
+                             stack: list[Card], board: tuple[Card, ...], n: int = 100000) -> list[float]:
+    if len(hands) < 2 or len(hands) > 10:
+        raise Exception(f'Too many or too little hands (count: {len(hands)})')
+
+    wins = [0 for _ in range(len(hands))]
 
     for sim_id in range(n):
         sim_board = copy.copy(board)
@@ -18,12 +20,17 @@ def get_percentage_for_hands(first_player_hand: tuple[Card, ...], second_player_
             next_card_index = random.randint(0, len(sim_stack) - 1)
             sim_board = (*sim_board, sim_stack.pop(next_card_index))
 
-        result = compare_combinations(find_best_combination(first_player_hand, sim_board),
-                                      find_best_combination(second_player_hand, sim_board))
+        winning_hands = [hands[0]]
+        for hand in hands[1:]:
+            result = compare_combinations(find_best_combination(winning_hands[0], sim_board),
+                                          find_best_combination(hand, sim_board))
 
-        if result == 1:
-            player_1_wins += 1
-        elif result == -1:
-            player_2_wins += 1
+            if result == -1:
+                winning_hands = [hand]
+            elif result == 0:
+                winning_hands.append(hand)
 
-    return player_1_wins * 100 / n, player_2_wins * 100 / n
+        for hand in winning_hands:
+            wins[hands.index(hand)] += 1
+
+    return [100 * w / n for w in wins]

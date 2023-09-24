@@ -24,17 +24,16 @@ def play_street(s: list[str], first_player_hand: tuple[Card, ...], second_player
 
     parsed_board = parse_board(b) if b else []
 
-    first_player_chances, second_player_chances = get_percentage_for_hands(
-        first_player_hand,
-        second_player_hand,
+    wins = get_percentage_for_hands(
+        [first_player_hand, second_player_hand],
         parse_stack(s),
         parsed_board
     )
 
     clear_screen()
-    print(f'first player hand: {first_player_hand} - {first_player_chances}%\n\n'
+    print(f'first player hand: {first_player_hand} - {wins[0]}%\n\n'
           f'{f"Board: {parsed_board}" if parsed_board else ""}\n\n'
-          f'Second player hand: {second_player_hand} - {second_player_chances}%\n')
+          f'Second player hand: {second_player_hand} - {wins[1]}%\n')
 
     return parsed_board
 
@@ -73,4 +72,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
